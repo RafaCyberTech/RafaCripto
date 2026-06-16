@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RafaCripto</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #080c12;
+  --surface: #131f2b;
+  --card: #17243b;
+  --card2: #1f3147;
+  --border: #2f4363;
+  --border2: #3a577f;
+  --rsa: #38bdf8;
+  --rsa-dim: rgba(56,189,248,0.12);
+  --rsa-glow: rgba(56,189,248,0.2);
+  --otp: #c3a6ff;
+  --otp-dim: rgba(167,139,250,0.18);
+  --otp-glow: rgba(167,139,250,0.3);
+  --green: #7ef3a3;
+  --yellow: #fce77f;
+  --red: #fca5a5;
+  --text: #ffffff;
+  --muted: #9db0d7;
+  --muted2: #c2d1f0;
+  --mono: 'Space Mono', monospace;
+  --sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --r: 14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 0%, rgba(56,189,248,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 300px at 80% 100%, rgba(167,139,250,0.04) 0%, transparent 70%);
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(56,189,248,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(56,189,248,0.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+
+.wrap{position:relative;z-index:1;max-width:500px;margin:0 auto;padding:0 16px 60px}
+
+/* ── HEADER ── */
+header{padding:28px 0 20px;text-align:center}
+.brand-tag{font-size:10px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;font-family:var(--mono);margin-bottom:10px}
+.brand-name{
+  font-size:42px;font-weight:800;line-height:1;
+  background:linear-gradient(135deg,var(--rsa) 0%,var(--otp) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.brand-sub{font-size:11px;color:var(--muted);margin-top:6px;font-family:var(--mono);letter-spacing:1px}
+
+/* ── TABS ── */
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.tab{
+  padding:14px 10px;border:1.5px solid var(--border);border-radius:12px;
+  background:var(--surface);color:var(--muted);font-family:var(--sans);
+  font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+}
+.tab .ti{font-size:22px}
+.tab.active-rsa{border-color:var(--rsa);color:var(--rsa);background:var(--rsa-dim);box-shadow:0 0 24px var(--rsa-glow)}
+.tab.active-otp{border-color:var(--otp);color:var(--otp);background:var(--otp-dim);box-shadow:0 0 24px var(--otp-glow)}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.card-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-family:var(--mono)}
+
+/* ── FIELDS ── */
+.field{margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+label{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-family:var(--mono)}
+input,textarea{
+  width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:var(--mono);font-size:13px;
+  padding:11px 13px;outline:none;transition:border-color .2s;resize:none;
+}
+input:focus,textarea:focus{border-color:var(--rsa)}
+.mode-otp input:focus,.mode-otp textarea:focus{border-color:var(--otp)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ── TOGGLE DIR ── */
+.dir-toggle{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;gap:4px;margin-bottom:14px}
+.dir-btn{flex:1;padding:9px;border:none;border-radius:7px;background:transparent;color:var(--muted);font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.dir-btn.on{background:var(--card2);color:var(--text)}
+
+/* ── BUTTONS ── */
+.btn{width:100%;padding:15px;border:none;border-radius:11px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.5px}
+.btn:active{transform:scale(.97)}
+.btn-rsa{background:linear-gradient(135deg,#38bdf8,#0284c7);color:#000}
+.btn-otp{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff}
+.btn-sm{
+  padding:8px 14px;border-radius:8px;font-size:11px;font-weight:700;
+  font-family:var(--sans);border:1px solid var(--border);background:var(--surface);
+  color:var(--muted2);cursor:pointer;transition:all .2s;letter-spacing:.3px;
+}
+.btn-sm:hover{border-color:var(--border2);color:var(--text)}
+
+/* ── QUICK ACTIONS ── */
+.quick-row{display:flex;gap:8px;margin-bottom:14px}
+
+/* ── ERROR ── */
+.err{
+  display:none;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);
+  border-radius:10px;padding:11px 14px;font-size:12px;color:var(--red);
+  font-family:var(--mono);margin-bottom:12px;line-height:1.5;
+}
+.err.show{display:block}
+
+/* ── STEPS ── */
+.steps-wrap{display:none}
+.steps-wrap.show{display:block}
+.steps-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.steps-head h2{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text)}
+.badge{font-size:9px;padding:3px 8px;border-radius:20px;font-family:var(--mono);font-weight:700;letter-spacing:1px}
+.badge-rsa{background:rgba(56,189,248,.18);color:var(--rsa)}
+.badge-otp{background:rgba(167,139,250,.18);color:var(--otp)}
+
+.step{
+  background:var(--surface);border-left:2px solid var(--border);
+  border-radius:0 10px 10px 0;padding:13px 15px;margin-bottom:9px;
+  animation:sIn .3s ease forwards;opacity:0;
+}
+.step.s-rsa{border-left-color:var(--rsa)}
+.step.s-otp{border-left-color:var(--otp)}
+@keyframes sIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+
+.sn{font-size:9px;color:var(--text);font-family:var(--mono);margin-bottom:3px;letter-spacing:1px}
+.st{font-size:12px;font-weight:700;margin-bottom:7px;color:var(--text)}
+.sc{font-family:var(--mono);font-size:11px;color:var(--text);line-height:1.75;word-break:break-all;white-space:pre-wrap}
+
+/* ── RESULT BOX ── */
+.res-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px;margin-top:14px;position:relative}
+.res-lbl{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text);margin-bottom:8px;font-family:var(--mono)}
+.res-val{font-family:var(--mono);font-size:12px;word-break:break-all;line-height:1.65;color:var(--text)}
+.copy-btn{position:absolute;top:12px;right:12px;background:rgba(30,45,69,.95);border:none;border-radius:6px;color:var(--text);font-size:10px;padding:4px 8px;cursor:pointer;font-family:var(--mono);transition:all .2s}
+.copy-btn:active{background:var(--rsa);color:#000}
+
+/* ── BIT TABLE ── */
+.btable{overflow-x:auto;margin-top:8px;border-radius:8px;border:1px solid var(--border)}
+.btable table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px;min-width:300px}
+.btable th{color:var(--text);padding:7px 9px;text-align:left;border-bottom:1px solid var(--border);background:var(--card);white-space:nowrap;font-size:9px;letter-spacing:1px}
+.btable td{padding:5px 9px;border-bottom:1px solid rgba(30,45,69,.5);vertical-align:middle;color:var(--text)}
+.btable tr:last-child td{border-bottom:none}
+.c-char{color:var(--text);font-weight:700;font-size:12px}
+.c-bits{color:var(--text);letter-spacing:.5px}
+.c-res{color:var(--text);letter-spacing:.5px}
+.c-key{color:#ffe99f}
+
+/* ── COLLAPSIBLE INFO ── */
+.coll-hd{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+.coll-bd{display:none;margin-top:13px;font-size:12px;color:var(--muted2);font-family:var(--mono);line-height:1.75}
+.coll-bd.open{display:block}
+.chev{transition:transform .2s;color:var(--muted);font-size:11px;font-family:var(--mono)}
+.chev.open{transform:rotate(180deg)}
+.info-chip{display:inline-block;font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(56,189,248,.07);color:var(--muted);font-family:var(--mono);margin-top:10px}
+.info-chip-otp{background:rgba(167,139,250,.07)}
+
+/* ── HISTORY ── */
+.hist-overlay{display:none;position:fixed;inset:0;background:rgba(8,12,18,.92);z-index:100;padding:20px 16px;overflow-y:auto}
+.hist-overlay.show{display:block}
+.hist-box{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:500px;margin:0 auto;overflow:hidden}
+.hist-hd{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
+.hist-hd h3{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted2)}
+.hist-close{background:none;border:1px solid var(--border);border-radius:7px;color:var(--muted2);font-size:12px;padding:5px 10px;cursor:pointer;font-family:var(--mono)}
+.hist-body{padding:16px;max-height:70vh;overflow-y:auto}
+.hist-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:10px;font-family:var(--mono);font-size:11px;color:var(--muted2);line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.hist-item:last-child{margin-bottom:0}
+.hist-empty{text-align:center;color:var(--muted);font-family:var(--mono);font-size:12px;padding:30px 0}
+.hist-item-head{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+
+/* ── ABOUT ── */
+.about-overlay{display:none;position:fixed;inset:0;background:rgba(8,12,18,.92);z-index:100;padding:20px 16px;overflow-y:auto}
+.about-overlay.show{display:block}
+.about-box{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:460px;margin:0 auto;overflow:hidden}
+.about-hd{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
+.about-body{padding:20px 18px;font-family:var(--mono);font-size:11px;color:var(--muted2);line-height:1.8}
+.about-body h4{color:var(--text);font-size:12px;margin:14px 0 6px;letter-spacing:1px;font-family:var(--sans)}
+.about-body h4:first-child{margin-top:0}
+
+/* ── KEY SUMMARY ── */
+.key-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.ks-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px;text-align:center}
+.ks-lbl{font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:2px;margin-bottom:4px}
+.ks-val{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--rsa);word-break:break-all}
+
+/* ── FOOTER ── */
+footer{text-align:center;padding:20px 0 10px;border-top:1px solid var(--border);margin-top:8px}
+.footer-brand{font-size:13px;font-weight:700;background:linear-gradient(135deg,var(--rsa),var(--otp));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.footer-tag{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px;letter-spacing:1px}
+
+/* highlight spans */
+.hr{color:var(--rsa);font-weight:700}
+.ho{color:var(--otp);font-weight:700}
+.hg{color:var(--green);font-weight:700}
+.hy{color:var(--yellow);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand-tag">Programa Educacional de Criptografia</div>
+    <div class="brand-name">RafaCripto</div>
+    <div class="brand-sub">RSA &nbsp;·&nbsp; Vernam / OTP</div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active-rsa" data-m="rsa" onclick="setMode('rsa')">
+      <span class="ti">🔐</span>RSA
+    </button>
+    <button class="tab" data-m="otp" onclick="setMode('otp')">
+      <span class="ti">🔑</span>Vernam / OTP
+    </button>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="quick-row">
+    <button class="btn-sm" onclick="showAbout()">ℹ️ Sobre</button>
+    <button class="btn-sm" onclick="showHistory()">📋 Histórico</button>
+  </div>
+
+  <!-- ERROR -->
+  <div class="err" id="errMsg"></div>
+
+  <!-- ═══════════════ RSA PANEL ═══════════════ -->
+  <div id="panel-rsa">
+    <!-- Info -->
+    <div class="card">
+      <div class="card-title coll-hd" onclick="toggleColl('rsa-info','cv-rsa')">
+        <span>ℹ️ Como funciona o RSA</span>
+        <span class="chev" id="cv-rsa">▼</span>
+      </div>
+      <div class="coll-bd" id="rsa-info">
+        RSA é um algoritmo de chave pública/privada baseado na dificuldade de fatorizar números grandes.<br/><br/>
+        <span class="hr">p, q</span> — dois primos escolhidos<br/>
+        <span class="hr">n = p×q</span> — módulo público<br/>
+        <span class="hr">φ(n) = (p-1)×(q-1)</span> — função de Euler<br/>
+        <span class="hr">e</span> — expoente público (primo e coprimo com φ)<br/>
+        <span class="hr">d = e⁻¹ mod φ(n)</span> — chave privada<br/><br/>
+        Codificação: A=0..Z=25, espaço=26 (com offset personalizável)<br/>
+        Cifrar: <span class="hr">C = M^e mod n</span><br/>
+        Decifrar: <span class="hr">M = C^d mod n</span>
+        <div class="info-chip">Todos os candidatos de e mostrados passo a passo</div>
+      </div>
+    </div>
+
+    <!-- Params -->
+    <div class="card">
+      <div class="card-title">Parâmetros RSA</div>
+      <div class="grid2">
+        <div class="field"><label>Primo p</label><input type="number" id="rp" value="7" min="2"/></div>
+        <div class="field"><label>Primo q</label><input type="number" id="rq" value="11" min="2"/></div>
+      </div>
+      <div class="field"><label>Offset alfabeto</label><input type="number" id="roff" value="0" min="0"/></div>
+
+      <!-- Key summary -->
+      <div class="key-summary" id="keySummary">
+        <div class="ks-item"><div class="ks-lbl">n</div><div class="ks-val" id="ks-n">—</div></div>
+        <div class="ks-item"><div class="ks-lbl">e</div><div class="ks-val" id="ks-e">—</div></div>
+        <div class="ks-item"><div class="ks-lbl">d</div><div class="ks-val" id="ks-d">—</div></div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn-sm" style="flex:1" onclick="genRandKeys()">🎲 Gerar aleatório</button>
+        <button class="btn-sm" style="flex:1" onclick="clearRSA()">🗑️ Limpar</button>
+      </div>
+    </div>
+
+    <!-- Message -->
+    <div class="card">
+      <div class="card-title">Operação</div>
+      <div class="dir-toggle">
+        <button class="dir-btn on" id="rd-enc" onclick="setRDir('enc')">🔒 Criptografar</button>
+        <button class="dir-btn" id="rd-dec" onclick="setRDir('dec')">🔓 Descriptografar</button>
+      </div>
+      <div class="field" id="rsa-msg-wrap">
+        <label>Mensagem (letras A-Z e espaço)</label>
+        <textarea id="rmsg" rows="2" placeholder="Ex: OLA MUNDO">OLA</textarea>
+      </div>
+      <div class="field" style="display:none" id="rsa-ciph-wrap">
+        <label>Blocos cifrados (números separados por espaço)</label>
+        <textarea id="rciph" rows="2" placeholder="Ex: 4rsa-key-here ..."></textarea>
+        <div style="margin-top:6px">
+          <div class="grid2">
+            <div class="field"><label>d (chave privada)</label><input type="number" id="rd-val" placeholder="d"/></div>
+            <div class="field"><label>n (módulo)</label><input type="number" id="rn-val" placeholder="n"/></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-rsa" onclick="runRSA()">▶ Executar RSA</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ OTP PANEL ═══════════════ -->
+  <div id="panel-otp" style="display:none" class="mode-otp">
+    <!-- Info -->
+    <div class="card">
+      <div class="card-title coll-hd" onclick="toggleColl('otp-info','cv-otp')">
+        <span>ℹ️ Como funciona o Vernam / OTP</span>
+        <span class="chev" id="cv-otp">▼</span>
+      </div>
+      <div class="coll-bd" id="otp-info">
+        A <span class="ho">Cifra de Vernam</span> é aplicada ao alfabeto usando valores decimais por letra.<br/><br/>
+        <span class="ho">Regra fundamental:</span> a chave deve ter o mesmo comprimento da mensagem e ser usada uma única vez.<br/><br/>
+        Cifrar: <span class="ho">C = (M + K) mod 26</span><br/>
+        Decifrar: <span class="ho">M = (C - K + 26) mod 26</span><br/><br/>
+        A começa em <strong>offset</strong> e segue: A=offset, B=offset+1, ..., Z=offset+25.<br/>
+        Offset inicial é opcional (padrão 0).
+        <div class="info-chip info-chip-otp">Cálculos em decimal por letra do alfabeto</div>
+      </div>
+    </div>
+
+    <!-- Params -->
+    <div class="card">
+      <div class="card-title">Parâmetros Vernam / OTP</div>
+      <div class="dir-toggle">
+        <button class="dir-btn on" id="od-enc" onclick="setODir('enc')">🔒 Criptografar</button>
+        <button class="dir-btn" id="od-dec" onclick="setODir('dec')">🔓 Descriptografar</button>
+      </div>
+      <div class="field" id="otp-msg-wrap">
+        <label>Mensagem (A-Z somente)</label>
+        <textarea id="omsg" rows="2" placeholder="Ex: OLAMUNDO">OLARAFA</textarea>
+      </div>
+      <div class="field" id="otp-ciph-wrap" style="display:none">
+        <label>Cifrado (letras e/ou números, ex: EAG54HDSW ou 4 0 6 15 5 8 8 21)</label>
+        <textarea id="ociph" rows="2" placeholder="Ex: EAG54HDSW ou 4 0 6 15 5 8 8 21"></textarea>
+      </div>
+      <div class="field">
+        <label>Offset alfabeto</label><input type="number" id="ooff" value="0" min="0" onchange="updateAlphabetMap()"/>
+      </div>
+      
+      <!-- Alphabet mapping display -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;font-family:var(--mono);font-size:11px;line-height:1.6">
+        <div style="color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Mapeamento A-Z para offset</div>
+        <div id="alphabetMapDisplay" style="color:var(--otp);word-break:break-all">A=0 B=1 C=2 D=3 E=4 F=5 G=6 H=7 I=8 J=9 K=10 L=11 M=12 N=13 O=14 P=15 Q=16 R=17 S=18 T=19 U=20 V=21 W=22 X=23 Y=24 Z=25</div>
+      </div>
+      
+      <div class="field">
+        <label>Chave (mesma extensão da mensagem)</label>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <input type="text" id="okey" value="XKCD" style="flex:1" placeholder="Chave"/>
+          <button class="btn-sm" style="white-space:nowrap;margin-bottom:0" onclick="genOTPKey()">🎲 Gerar</button>
+        </div>
+        <div style="margin-top:5px;font-size:10px;font-family:var(--mono);color:var(--muted)" id="okey-len-hint"></div>
+      </div>
+      <button class="btn btn-otp" onclick="runOTP()">▶ Executar Vernam / OTP</button>
+    </div>
+  </div>
+
+  <!-- STEPS OUTPUT -->
+  <div class="steps-wrap" id="stepsWrap">
+    <div class="steps-head">
+      <h2>Passos detalhados</h2>
+      <span class="badge" id="stBadge"></span>
+    </div>
+    <div id="stepsOut"></div>
+    <div class="res-box" id="resBox">
+      <div class="res-lbl" id="resLbl">Resultado</div>
+      <button class="copy-btn" onclick="copyRes()">copiar</button>
+      <div class="res-val" id="resVal"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-brand">RafaCyber</div>
+    <div class="footer-tag">Segurança Além do Click!</div>
+  </footer>
+</div>
+
+<!-- HISTORY OVERLAY -->
+<div class="hist-overlay" id="histOverlay">
+  <div class="hist-box">
+    <div class="hist-hd">
+      <h3>📋 Histórico</h3>
+      <button class="hist-close" onclick="closeHistory()">✕ fechar</button>
+    </div>
+    <div class="hist-body" id="histBody"></div>
+  </div>
+</div>
+
+<!-- ABOUT OVERLAY -->
+<div class="about-overlay" id="aboutOverlay">
+  <div class="about-box">
+    <div class="about-hd">
+      <h3 style="font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted2)">ℹ️ Sobre o Programa</h3>
+      <button class="hist-close" onclick="closeAbout()">✕ fechar</button>
+    </div>
+    <div class="about-body">
+      <h4>RafaCripto</h4>
+      Programa educacional desenvolvido para apoiar o estudo da criptografia de forma prática, visual e explicativa.
+      <h4>Objetivo</h4>
+      Permitir que estudantes acompanhem, passo a passo, como ocorre a geração de chaves, a codificação da mensagem, a criptografia e a descriptografia em RSA e Vernam/OTP.
+      <h4>O que o programa oferece</h4>
+      · Entrada de p e q para geração de chaves RSA<br/>
+      · Geração automática de chaves aleatórias<br/>
+      · Visualização de todos os candidatos de e testados<br/>
+      · Operação de blocos (k) quando n é pequeno<br/>
+      · Cifra de Vernam com valores decimais por letra<br/>
+      · Geração automática de chave OTP aleatória<br/>
+      · Histórico de operações realizadas<br/
+      <h4>Finalidade</h4>
+      Ferramenta de apoio ao ensino, especialmente em disciplinas de segurança da informação e fundamentos de criptografia. Os cálculos priorizam compreensão didática.
+      <h4>Autor</h4>
+      RafaCyber- Rafique Eusebio Norapelana<br/>
+      RafaCripto v2.0 — 2026
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+let mode = 'rsa';
+let rsaDir = 'enc';
+let otpDir = 'enc';
+const history = [];
+
+// ══════════════════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════════════════
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(b => {
+    b.className = 'tab';
+    if (b.dataset.m === m) b.classList.add('active-' + m);
+  });
+  document.getElementById('panel-rsa').style.display = m === 'rsa' ? 'block' : 'none';
+  document.getElementById('panel-otp').style.display = m === 'otp' ? 'block' : 'none';
+  if (m === 'otp') updateAlphabetMap();
+  hideSteps(); clearErr();
+}
+
+function setRDir(d) {
+  rsaDir = d;
+  document.getElementById('rd-enc').className = 'dir-btn' + (d==='enc'?' on':'');
+  document.getElementById('rd-dec').className = 'dir-btn' + (d==='dec'?' on':'');
+  document.getElementById('rsa-msg-wrap').style.display  = d==='enc' ? 'block' : 'none';
+  document.getElementById('rsa-ciph-wrap').style.display = d==='dec' ? 'block' : 'none';
+}
+
+function setODir(d) {
+  otpDir = d;
+  document.getElementById('od-enc').className = 'dir-btn' + (d==='enc'?' on':'');
+  document.getElementById('od-dec').className = 'dir-btn' + (d==='dec'?' on':'');
+  document.getElementById('otp-msg-wrap').style.display  = d==='enc' ? 'block' : 'none';
+  document.getElementById('otp-ciph-wrap').style.display = d==='dec' ? 'block' : 'none';
+}
+
+function showErr(msg) {
+  const el = document.getElementById('errMsg');
+  el.textContent = '⚠ ' + msg;
+  el.classList.add('show');
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function clearErr() { document.getElementById('errMsg').classList.remove('show'); }
+function hideSteps() { document.getElementById('stepsWrap').classList.remove('show'); }
+
+function toggleColl(id, chevId) {
+  document.getElementById(id).classList.toggle('open');
+  document.getElementById(chevId).classList.toggle('open');
+}
+
+function showSteps(steps, result, m, lbl) {
+  const out = document.getElementById('stepsOut');
+  const badge = document.getElementById('stBadge');
+  badge.textContent = m.toUpperCase();
+  badge.className = 'badge badge-' + m;
+  out.innerHTML = '';
+  steps.forEach((s,i) => {
+    const div = document.createElement('div');
+    div.className = `step s-${m}`;
+    div.style.animationDelay = (i * .055) + 's';
+    div.innerHTML = `<div class="sn">PASSO ${String(i+1).padStart(2,'0')}</div><div class="st">${s.t}</div><div class="sc">${s.c}</div>`;
+    out.appendChild(div);
+  });
+  // (calc box removed) show only steps and result
+  document.getElementById('resLbl').textContent = lbl;
+  document.getElementById('resVal').textContent = result;
+  const w = document.getElementById('stepsWrap');
+  w.classList.add('show');
+  w.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function copyRes() {
+  navigator.clipboard.writeText(document.getElementById('resVal').textContent).then(() => {
+    const b = document.querySelector('.copy-btn');
+    b.textContent = '✓ copiado';
+    setTimeout(() => b.textContent = 'copiar', 1500);
+  });
+}
+
+
+// History / About
+function showHistory() {
+  const body = document.getElementById('histBody');
+  if (!history.length) {
+    body.innerHTML = '<div class="hist-empty">Nenhuma operação registada ainda.</div>';
+  } else {
+    body.innerHTML = history.map((h,i) =>
+      `<div class="hist-item"><div class="hist-item-head">OPERAÇÃO ${String(i+1).padStart(2,'0')} · ${h.ts}</div>${h.text}</div>`
+    ).reverse().join('');
+  }
+  document.getElementById('histOverlay').classList.add('show');
+}
+function closeHistory() { document.getElementById('histOverlay').classList.remove('show'); }
+function showAbout() { document.getElementById('aboutOverlay').classList.add('show'); }
+function closeAbout() { document.getElementById('aboutOverlay').classList.remove('show'); }
+
+function addHistory(text) {
+  const now = new Date();
+  history.push({ ts: now.toLocaleTimeString('pt'), text });
+}
+
+// ══════════════════════════════════════════════════════
+//  MATH UTILS
+// ══════════════════════════════════════════════════════
+function isPrime(n) {
+  if (n < 2) return false;
+  if (n === 2) return true;
+  if (n % 2 === 0) return false;
+  for (let i = 3; i <= Math.sqrt(n); i += 2) if (n % i === 0) return false;
+  return true;
+}
+
+function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+
+function modPow(base, exp, mod) {
+  let result = 1n;
+  base = BigInt(base) % BigInt(mod);
+  exp = BigInt(exp);
+  mod = BigInt(mod);
+  while (exp > 0n) {
+    if (exp % 2n === 1n) result = result * base % mod;
+    exp >>= 1n;
+    base = base * base % mod;
+  }
+  return Number(result);
+}
+
+function modInverse(e, phi) {
+  let [or, r] = [e, phi];
+  let [os, s] = [1, 0];
+  while (r !== 0) {
+    const q = Math.floor(or / r);
+    [or, r] = [r, or - q * r];
+    [os, s] = [s, os - q * s];
+  }
+  return ((os % phi) + phi) % phi;
+}
+
+// computeK: quantos "digits" em base n para representar valores até 26
+function computeK(n) {
+  let k = 1, power = n;
+  while (power <= 26) { power *= n; k++; }
+  return k;
+}
+
+// ══════════════════════════════════════════════════════
+//  ALPHABET ENCODING (A=0..Z=25, space=26)
+// ══════════════════════════════════════════════════════
+function encodeAlphabet(msg, offset) {
+  msg = msg.toUpperCase();
+  return msg.split('').map(c => {
+    if (c >= 'A' && c <= 'Z') return c.charCodeAt(0) - 65 + offset;
+    return offset + 26; // space or unknown
+  });
+}
+
+function decodeAlphabet(vals, offset) {
+  return vals.map(v => {
+    const n = v - offset;
+    if (n >= 0 && n <= 25) return String.fromCharCode(65 + n);
+    return ' ';
+  }).join('');
+}
+
+function letterToOffsetValue(ch, offset) {
+  return ch.charCodeAt(0) - 65 + offset;
+}
+
+function valueToOffsetLetter(v, offset) {
+  const n = v - offset;
+  if (n >= 0 && n <= 25) return String.fromCharCode(65 + n);
+  return String(v);
+}
+
+function encodeAlphabet26(msg, offset) {
+  const clean = msg.toUpperCase().replace(/[^A-Z]/g, '');
+  return clean.split('').map(c => letterToOffsetValue(c, offset));
+}
+
+function decodeAlphabet26(vals, offset) {
+  return vals.map(v => valueToOffsetLetter(v, offset)).join('');
+}
+
+function decodeAlphabet26Single(v, offset) {
+  if (!Number.isInteger(v)) return String(v);
+  if (v < 0 || v > 25) return String(v);
+  return valueToOffsetLetter(v, offset);
+}
+
+function otpResultString(vals, offset) {
+  return vals.map(v => decodeAlphabet26Single(v, offset)).join('');
+}
+
+// ══════════════════════════════════════════════════════
+//  RSA
+// ══════════════════════════════════════════════════════
+function genRandKeys() {
+  // Primos pequenos para fins didácticos; garantir n = p*q > 26
+  const primes = [3,5,7,11,13,17,19];
+  let p, q;
+  do {
+    p = primes[Math.floor(Math.random()*primes.length)];
+    q = primes[Math.floor(Math.random()*primes.length)];
+  } while (p === q || p*q <= 26);
+  document.getElementById('rp').value = p;
+  document.getElementById('rq').value = q;
+  updateKeySummary(p, q);
+}
+
+function updateKeySummary(p, q) {
+  const n = p * q;
+  const phi = (p-1)*(q-1);
+  let e = 3;
+  while (!isPrime(e) || gcd(e, phi) !== 1) e += 2;
+  const d = modInverse(e, phi);
+  document.getElementById('ks-n').textContent = n;
+  document.getElementById('ks-e').textContent = e;
+  document.getElementById('ks-d').textContent = d;
+}
+
+function clearRSA() {
+  document.getElementById('rmsg').value = '';
+  document.getElementById('rciph').value = '';
+  clearErr(); hideSteps();
+}
+
+document.getElementById('rp').addEventListener('change', () => {
+  const p = parseInt(document.getElementById('rp').value);
+  const q = parseInt(document.getElementById('rq').value);
+  if (isPrime(p) && isPrime(q) && p !== q) updateKeySummary(p, q);
+});
+document.getElementById('rq').addEventListener('change', () => {
+  const p = parseInt(document.getElementById('rp').value);
+  const q = parseInt(document.getElementById('rq').value);
+  if (isPrime(p) && isPrime(q) && p !== q) updateKeySummary(p, q);
+});
+// init
+updateKeySummary(7, 11);
+
+function findE(phi) {
+  // Returns {e, candidates: [{val, g, prime, ok}]}
+  const candidates = [];
+  let e = 3;
+  while (true) {
+    const g = gcd(e, phi);
+    const prime = isPrime(e);
+    const ok = g === 1 && prime;
+    candidates.push({val:e, g, prime, ok});
+    if (ok) break;
+    e += 2;
+    if (candidates.length > 30) break; // safety
+  }
+  return {e, candidates};
+}
+
+function runRSA() {
+  clearErr(); hideSteps();
+  const p = parseInt(document.getElementById('rp').value);
+  const q = parseInt(document.getElementById('rq').value);
+  const offset = parseInt(document.getElementById('roff').value) || 0;
+
+  if (!isPrime(p)) return showErr(`${p} não é primo. Ex: 3, 7, 11, 13, 17, 61, 97...`);
+  if (!isPrime(q)) return showErr(`${q} não é primo. Ex: 3, 7, 11, 13, 17, 61, 97...`);
+  if (p === q) return showErr('p e q devem ser primos diferentes.');
+
+  const n = p * q;
+  const phi = (p-1)*(q-1);
+  const {e, candidates} = findE(phi);
+  const d = modInverse(e, phi);
+  const k = computeK(n);
+
+  updateKeySummary(p, q);
+
+  const steps = [];
+
+  // Step 1 — primes
+  steps.push({t:'Verificar primalidade de p e q', c:
+    `p = <span class="hr">${p}</span> → primo ✓\nq = <span class="hr">${q}</span> → primo ✓`
+  });
+
+  // Step 2 — n
+  steps.push({t:'Calcular n (módulo público)', c:
+    `n = p × q\nn = ${p} × ${q}\n<span class="hr">n = ${n}</span>`
+  });
+
+  // Step 3 — phi
+  steps.push({t:'Calcular φ(n) — Função de Euler', c:
+    `φ(n) = (p−1) × (q−1)\nφ(n) = (${p}−1) × (${q}−1)\nφ(n) = ${p-1} × ${q-1}\n<span class="hr">φ(n) = ${phi}</span>`
+  });
+
+  // Step 4 — choosing e
+  const eCandLines = candidates.map(c =>
+    `  testar e=${c.val}: mdc(e,φ)=${c.g}, primo?${c.prime} → ${c.ok?'<span class="hg">✓ ESCOLHIDO</span>':'✗'}`
+  ).join('\n');
+  steps.push({t:'Escolher expoente público e (primo e coprimo com φ)', c:
+    `Condições: 1 &lt; e &lt; φ(n), mdc(e,φ)=1, e primo\n\n${eCandLines}\n\n<span class="hr">e = ${e}</span>`
+  });
+
+  // Step 5 — d
+  steps.push({t:'Calcular chave privada d = e⁻¹ mod φ(n)', c:
+    `d = ${e}⁻¹ mod ${phi}\n<span class="hr">d = ${d}</span>\n\nVerificação: (e × d) mod φ(n)\n= (${e} × ${d}) mod ${phi} = ${(e*d)%phi} ✓`
+  });
+
+  // Step 6 — k
+  steps.push({t:`Calcular k (blocos por caracter, base n)`, c:
+    `n = ${n}; maior valor alfabeto = 26\nk é o menor inteiro tal que n^k > 26\n<span class="hr">k = ${k}</span>\n\nCada caracter será representado em ${k} bloco(s).`
+  });
+
+  // Step 7 — keys
+  steps.push({t:'Chaves geradas', c:
+    `🔑 Chave Pública:  (e=<span class="hr">${e}</span>, n=<span class="hr">${n}</span>)\n🗝️  Chave Privada: (d=<span class="hr">${d}</span>, n=<span class="hr">${n}</span>)`
+  });
+
+  if (rsaDir === 'enc') {
+    const msg = document.getElementById('rmsg').value.trim();
+    if (!msg) return showErr('Digite uma mensagem para criptografar.');
+
+    const vals = encodeAlphabet(msg, offset);
+
+    // Step 8 — encoding
+    const encLines = vals.map((v,i) => {
+      const ch = msg.toUpperCase()[i];
+      return `  [${i}] '${ch}' → ${v} (normalizado: ${v-offset})`;
+    }).join('\n');
+    steps.push({t:`Codificar mensagem "${msg.toUpperCase()}"`, c:
+      `offset = ${offset}\nA=0..Z=25, espaço=26\n\n${encLines}`
+    });
+
+    // Step 9 — encrypt
+
+    // para cada valor v: decompõe em k dígitos base-n, cifra cada um
+    const cipherBlocks = []; // valores cifrados finais
+    let encDetail = `Fórmula: C = M^e mod n = M^${e} mod ${n}\n\n`;
+    vals.forEach((v, pos) => {
+      let m = v;
+      encDetail += `[pos ${pos}] m = ${v}\n`;
+      for (let j = 0; j < k; j++) {
+        const digit = m % n;
+        const cipher = modPow(digit, e, n);
+        encDetail += `  bloco ${j}: digit=${digit}, C=${digit}^${e} mod ${n} = <span class="hr">${cipher}</span>\n`;
+        cipherBlocks.push(cipher);
+        m = Math.floor(m / n);
+      }
+    });
+    steps.push({t:`Criptografar (${vals.length} caracter(es), ${cipherBlocks.length} bloco(s))`, c: encDetail.trim()});
+
+    // Step 10 — verify (decryptValues)
+    const decVals = [];
+    let decDetail = `Fórmula: M = C^d mod n = C^${d} mod ${n}\n\n`;
+    for (let i = 0; i < vals.length; i++) {
+      let value = 0;
+      decDetail += `[char ${i}]\n`;
+      for (let j = 0; j < k; j++) {
+        const cb = cipherBlocks[i*k+j];
+        const digit = modPow(cb, d, n);
+        const contrib = digit * Math.pow(n, j);
+        decDetail += `  bloco ${j}: ${cb}^${d} mod ${n} = ${digit}, contrib=${digit}×${n}^${j}=${contrib}\n`;
+        value += contrib;
+      }
+      decDetail += `  soma = ${value}\n`;
+      decVals.push(value);
+    }
+    const recovered = decodeAlphabet(decVals, offset);
+    decDetail += `\n<span class="hg">Mensagem recuperada: ${recovered}</span>`;
+    steps.push({t:'Descriptografar (verificação)', c: decDetail.trim()});
+
+    const result = cipherBlocks.join(' ');
+    addHistory(`[RSA CIFRAR] p=${p} q=${q} e=${e} d=${d} n=${n}
+k=${k}
+Mensagem: ${msg.toUpperCase()}
+Cifrado: ${result}
+Recuperado: ${recovered}`);
+    showSteps(steps, result, 'rsa', '🔒 Blocos cifrados');
+
+  } else {
+    // Decrypt mode
+    const rawCiph = document.getElementById('rciph').value.trim();
+    const dIn = document.getElementById('rd-val').value.trim();
+    const nIn = document.getElementById('rn-val').value.trim();
+
+    if (!rawCiph) return showErr('Insira os blocos cifrados no campo de mensagem.');
+    if (!dIn || !nIn) return showErr('Insira d (chave privada) e n (módulo) para descriptografar.');
+
+    const dVal = parseInt(dIn);
+    const nVal = parseInt(nIn);
+    const kVal = computeK(nVal);
+    const blocks = rawCiph.trim().split(/[\s,]+/).map(x => parseInt(x)).filter(x => !isNaN(x));
+
+    if (blocks.length % kVal !== 0)
+      return showErr(`Número de blocos (${blocks.length}) não é múltiplo de k=${kVal} para n=${nVal}.`);
+
+    steps.push({t:'Parâmetros fornecidos', c:
+      `d = <span class="hr">${dVal}</span>\nn = <span class="hr">${nVal}</span>\nk = ${kVal}\nOffset = ${offset}\nBlocos: ${blocks.join(' ')}`
+    });
+
+    let decDetail = `Fórmula: M = C^d mod n = C^${dVal} mod ${nVal}\n\n`;
+    const decVals = [];
+    const numChars = blocks.length / kVal;
+    for (let i = 0; i < numChars; i++) {
+      let value = 0;
+      decDetail += `[char ${i}]\n`;
+      for (let j = 0; j < kVal; j++) {
+        const c = blocks[i*kVal+j];
+        const digit = modPow(c, dVal, nVal);
+        const contrib = digit * Math.pow(nVal, j);
+        decDetail += `  bloco ${j}: c=${c}, m_parcial=${c}^${dVal} mod ${nVal}=${digit}, contrib=${digit}×${nVal}^${j}=${contrib}\n`;
+        value += contrib;
+      }
+      decDetail += `  soma dos blocos = ${value}\n\n`;
+      decVals.push(value);
+    }
+    const msg = decodeAlphabet(decVals, offset);
+    decDetail += `<span class="hg">Mensagem recuperada: ${msg}</span>`;
+    steps.push({t:`Descriptografar ${numChars} caracter(es)`, c: decDetail.trim()});
+
+    addHistory(`[RSA DECIFRAR] d=${dVal} n=${nVal}\nCifrado: ${blocks.join(' ')}\nMensagem: ${msg}`);
+    showSteps(steps, msg, 'rsa', '🔓 Mensagem decifrada');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  VERNAM / OTP
+// ══════════════════════════════════════════════════════
+function toBin8(n) { return n.toString(2).padStart(8,'0'); }
+function toHex2(n) { return n.toString(16).toUpperCase().padStart(2,'0'); }
+
+function genOTPKey() {
+  const src = otpDir === 'enc'
+    ? document.getElementById('omsg').value
+    : document.getElementById('ociph').value.trim().split(/\s+/).filter(Boolean);
+  const len = src.length;
+  if (!len) return showErr('Digite a mensagem primeiro para gerar uma chave do tamanho certo.');
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let key = '';
+  for (let i = 0; i < len; i++) key += chars[Math.floor(Math.random()*chars.length)];
+  document.getElementById('okey').value = key;
+  updateKeyLenHint();
+}
+
+function updateKeyLenHint() {
+  const key = document.getElementById('okey').value;
+  const msg = otpDir === 'enc' ? document.getElementById('omsg').value : '';
+  const hint = document.getElementById('okey-len-hint');
+  if (otpDir === 'enc' && msg) {
+    const ok = key.length >= msg.length;
+    hint.innerHTML = `Chave: ${key.length} chars | Mensagem: ${msg.length} chars ${ok ? '<span style="color:var(--green)">✓ OK</span>' : '<span style="color:var(--red)">⚠ curta</span>'}`;
+  } else {
+    hint.textContent = `Comprimento da chave: ${key.length}`;
+  }
+}
+document.getElementById('okey').addEventListener('input', updateKeyLenHint);
+document.getElementById('omsg').addEventListener('input', updateKeyLenHint);
+updateKeyLenHint();
+
+// Initialize alphabet map for offset
+updateAlphabetMap();
+
+function parseOTPInput(raw, offset) {
+  const tokens = raw.match(/[A-Za-z]+|[0-9]+/g);
+  if (!tokens) return { vals: [], label: '', error: 'Formato inválido. Use letras A-Z e/ou números decimais.' };
+  const vals = [];
+  tokens.forEach(token => {
+    if (/^[0-9]+$/.test(token)) {
+      const n = parseInt(token, 10);
+      if (Number.isNaN(n) || n < 0) return;
+      vals.push(n);
+    } else {
+      token.toUpperCase().split('').forEach(ch => {
+        vals.push(letterToOffsetValue(ch, offset));
+      });
+    }
+  });
+  if (!vals.length) return { vals: [], label: '', error: 'Formato inválido. Use letras A-Z e/ou números decimais.' };
+  return { vals, label: raw.trim() };
+}
+
+function updateAlphabetMap() {
+   const offset = parseInt(document.getElementById('ooff').value) || 0;
+   const display = document.getElementById('alphabetMapDisplay');
+   let map = [];
+   for (let i = 0; i < 26; i++) {
+     const letter = String.fromCharCode(65 + i);
+     const value = i + offset;
+     map.push(`${letter}=${value}`);
+   }
+   display.textContent = map.join(' ');
+}
+
+function runOTP() {
+  clearErr(); hideSteps();
+  const key = document.getElementById('okey').value;
+  const offset = parseInt(document.getElementById('ooff').value) || 0;
+  if (!key) return showErr('Insira uma chave Vernam/OTP.');
+
+  const steps = [];
+  let inputVals, inputLabel;
+  let keyVals;
+
+  if (otpDir === 'enc') {
+    const msg = document.getElementById('omsg').value;
+    if (!msg) return showErr('Digite uma mensagem para criptografar.');
+    if (/[^A-Za-z]/.test(msg)) return showErr('Use apenas letras A-Z na mensagem OTP.');
+    if (/[^A-Za-z]/.test(key)) return showErr('Use apenas letras A-Z na chave OTP.');
+    if (key.length < msg.length) return showErr(`A chave (${key.length} chars) deve ter pelo menos o mesmo comprimento da mensagem (${msg.length} chars). Use "Gerar" para criar uma chave adequada.`);
+    const msgClean = msg.toUpperCase();
+    const keyClean = key.toUpperCase().slice(0, msg.length);
+    inputVals = encodeAlphabet26(msgClean, offset);
+    keyVals = encodeAlphabet26(keyClean, offset);
+    inputLabel = msgClean;
+  } else {
+    const raw = document.getElementById('ociph').value.trim();
+    if (!raw) return showErr('Insira os valores cifrados.');
+    const parsed = parseOTPInput(raw, offset);
+    if (parsed.error) return showErr(parsed.error);
+    inputVals = parsed.vals;
+    if (!inputVals.length) return showErr('Formato inválido. Use letras A-Z e/ou números decimais.');
+    if (inputVals.some(v => v < 0)) return showErr('Os valores cifrados devem ser números positivos ou letras A-Z.');
+    if (/[^A-Za-z]/.test(key)) return showErr('Use apenas letras A-Z na chave OTP.');
+    if (key.length < inputVals.length) return showErr(`A chave (${key.length} chars) deve ter pelo menos o tamanho do cifrado (${inputVals.length}).`);
+    const keyClean = key.toUpperCase().slice(0, inputVals.length);
+    keyVals = encodeAlphabet26(keyClean, offset);
+    inputLabel = parsed.label;
+  }
+
+  // Step 1 — entrada
+  steps.push({t:'Entrada', c:
+    `${otpDir==='enc'?'Texto':'Cifrado'}: <span class="ho">${inputLabel}</span>\nValores: ${inputVals.join(', ')}`
+  });
+
+  // Step 2 — chave
+  steps.push({t:'Chave Vernam/OTP (valores decimais por letra)', c:
+    `Chave: <span class="ho">${key.slice(0, inputVals.length)}</span>\nValores: ${keyVals.join(', ')}\nOffset: ${offset}\n\n⚠ Regra: chave usada UMA única vez e descartada.`
+  });
+
+  const resultVals = inputVals.map((v,i) => {
+    if (otpDir === 'enc') return v + keyVals[i];
+    return v - keyVals[i];
+  });
+
+  const maxShow = Math.min(inputVals.length, 20);
+  let tableHTML = `<div class="btable"><table>
+    <tr><th>Pos</th><th>Entrada</th><th>Chave K</th><th>Resultado (mod26)</th><th>Saída</th></tr>`;
+  for (let i = 0; i < maxShow; i++) {
+    const iv = inputVals[i];
+    const kv = keyVals[i];
+    const op = otpDir === 'enc' ? iv + kv : iv - kv;
+    const mod = ((op % 26) + 26) % 26; // 0..25
+    const inputChar = otpDir === 'enc' ? (inputLabel[i] || decodeAlphabet26Single(iv, offset)) : decodeAlphabet26Single(iv, offset);
+    const keyChar = decodeAlphabet26Single(kv, offset);
+    const outChar = decodeAlphabet26Single(mod + offset, offset);
+    tableHTML += `<tr>
+      <td class="c-bits">${i+1}</td>
+      <td class="c-char">${inputChar} (${iv})</td>
+      <td class="c-key">${kv} (${keyChar})</td>
+      <td class="c-res">${mod}</td>
+      <td class="c-char">${outChar}</td>
+    </tr>`;
+  }
+  if (inputVals.length > maxShow)
+    tableHTML += `<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:8px;font-family:var(--mono);font-size:10px">... +${inputVals.length-maxShow} caracteres</td></tr>`;
+  tableHTML += `</table></div>`;
+
+  steps.push({t:`Operação Vernam / OTP — ${inputVals.length} ${inputVals.length===1?'caractere':'caracteres'}`, c: tableHTML});
+
+  // Cálculos por dígito: mostrar M, K, soma/subtração, resultado mod 26 e carácter
+  let calcLines = '<div style="font-family:var(--mono);font-size:12px;white-space:pre-wrap">';
+  calcLines += otpDir === 'enc' ? '<strong>Fórmula: C = (M + K) mod 26</strong>\n\n' : '<strong>Fórmula: M = (C - K + 26) mod 26</strong>\n\n';
+  for (let i = 0; i < inputVals.length; i++) {
+    const iv = inputVals[i];
+    const kv = keyVals[i];
+    const op = otpDir === 'enc' ? iv + kv : iv - kv;
+    // resultado módulo 26 em 0..25
+    const mod = ((op % 26) + 26) % 26;
+    const outChar = decodeAlphabet26Single(mod + offset, offset);
+    const inChar = otpDir === 'enc' ? (inputLabel[i] || decodeAlphabet26Single(iv, offset)) : decodeAlphabet26Single(iv, offset);
+    const keyChar = decodeAlphabet26Single(kv, offset);
+    if (otpDir === 'enc') {
+      calcLines += `Pos ${i+1}: M='${inChar}' (${iv}) + K='${keyChar}' (${kv}) = ${iv}+${kv} = ${op} → (mod26) ${mod} → '${outChar}'\n`;
+    } else {
+      calcLines += `Pos ${i+1}: C='${inChar}' (${iv}) - K='${keyChar}' (${kv}) = ${iv}-${kv} = ${op} → (mod26) ${mod} → '${outChar}'\n`;
+    }
+  }
+  calcLines += '</div>';
+  steps.push({t:'Cálculos por dígito', c: calcLines});
+
+  const formula = otpDir==='enc'
+    ? `C = M + K\n\nDecifrar: M = C - K`
+    : `M = C - K\n\nDecifrar em valores decimais por letra.`;
+  steps.push({t:'Fórmula Vernam', c: formula});
+
+  // Usar valores reduzidos por módulo 26 para saída final (consistente com cálculos)
+  const modVals = resultVals.map(op => ((op % 26) + 26) % 26);
+  let result, resLbl;
+  if (otpDir === 'enc') {
+    result = modVals.map(m => decodeAlphabet26Single(m + offset, offset)).join(' ');
+    resLbl = '🔒 Cifrado';
+    addHistory(`[VERNAM CIFRAR]\nMensagem: ${inputLabel}\nChave: ${key.slice(0,inputVals.length)}\nOffset: ${offset}\nCifrado: ${result}`);
+  } else {
+    result = modVals.map(m => decodeAlphabet26Single(m + offset, offset)).join(' ');
+    resLbl = '🔓 Texto decifrado';
+    addHistory(`[VERNAM DECIFRAR]\nCifrado: ${inputLabel}\nChave: ${key.slice(0,inputVals.length)}\nOffset: ${offset}\nMensagem: ${result}`);
+  }
+
+  showSteps(steps, result, 'otp', resLbl);
+}
+</script>
+</body>
+</html>
